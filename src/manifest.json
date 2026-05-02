@@ -7,6 +7,11 @@
     "48": "icons/icon.svg",
     "96": "icons/icon.svg"
   },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "t3-input-toggle@localhost"
+    }
+  },
   "content_scripts": [
     {
       "matches": ["https://t3.chat/*"],
