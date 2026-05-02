@@ -1,0 +1,13 @@
+{
+  "name": "t3-input-toggle",
+  "version": "1.0.0",
+  "description": "Adds a toggle button to collapse/expand the input box on t3.chat",
+  "private": true,
+  "scripts": {
+    "build": "web-ext build --source-dir src --overwrite-dest",
+    "lint": "web-ext lint --source-dir src"
+  },
+  "devDependencies": {
+    "web-ext": "^8.0.0"
+  }
+}

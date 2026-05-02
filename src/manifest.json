@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "T3 Chat Input Toggle",
+  "version": "1.0",
+  "description": "Adds a toggle button to collapse/expand the input box on t3.chat",
+  "content_scripts": [
+    {
+      "matches": ["https://t3.chat/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
