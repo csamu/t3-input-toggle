@@ -163,6 +163,7 @@
     style.id = "t3-toggle-styles";
     style.textContent = `
       .t3-toggle-wrapper {
+        position: relative;
         transition: height 300ms cubic-bezier(0.4, 0, 0.2, 1);
       }
       .t3-toggle-overlay {
