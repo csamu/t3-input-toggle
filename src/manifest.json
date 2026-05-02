@@ -3,6 +3,10 @@
   "name": "T3 Chat Input Toggle",
   "version": "1.0",
   "description": "Adds a toggle button to collapse/expand the input box on t3.chat",
+  "icons": {
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg"
+  },
   "content_scripts": [
     {
       "matches": ["https://t3.chat/*"],
