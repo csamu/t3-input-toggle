@@ -204,6 +204,9 @@
         position: absolute;
         inset: 0;
         z-index: 1;
+        /* Solid overlay to hide the input during animation.
+         * Cannot use opacity on the input itself because the site's
+         * backdrop-blur causes compositing glitches with text behind it. */
         background: var(--chat-background);
         pointer-events: none;
         border-radius: 20px 20px 0 0;
