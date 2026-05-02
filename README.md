@@ -13,7 +13,7 @@ A Firefox extension that adds a collapse/expand button to the input box on [t3.c
 
 ### From source
 
-Since this isn't an officially signed extension (yet), it must be sideloaded by installing it as a "Temporary Add-on", and to be installed every time the browser restarts, or by using Firefox Developer Edition.
+Since this isn't an officially signed extension (yet), it must be sideloaded by installing it as a "Temporary Add-on", and to be installed every time the browser restarts. But there are exceptions.
 
 1. Clone or download this repo
 2. Run `npm install` to install web-ext
@@ -23,7 +23,7 @@ Since this isn't an officially signed extension (yet), it must be sideloaded by 
 
 Now a collapse button will appear in the T3.chat input field.
 
-If you use Firefox Developer Edition, you can set `xpinstall.signatures.required` to `false` in `about:config`, and then install the extension permanently via "Install Add-on From File". It will then persist despite being unsigned.
+Firefox Developer Edition, Nightly, and ESR allow disabling signature enforcement. Set `xpinstall.signatures.required` to `false` in `about:config`, then install the extension permanently via "Install Add-on From File". This preference does not exist on Release and Beta.
 
 ## License
 
