@@ -63,19 +63,19 @@
     btn.innerHTML = ICON_DOWN;
   }
 
-  // --- Wrapper + overlay ---
+  // --- Overlay ---
 
-  function getOrCreateWrapper(container) {
-    let wrapper = container.closest(".t3-toggle-wrapper");
-    if (!wrapper) {
-      wrapper = createElement("div", "t3-toggle-wrapper", container.parentElement);
-      wrapper.appendChild(container);
+  function getOrCreateOverlay(container) {
+    let overlay = container.querySelector(".t3-toggle-overlay");
+    if (!overlay) {
+      overlay = createElement("div", "t3-toggle-overlay", container);
+      // Ensure container can position the overlay absolutely
+      const computedPosition = getComputedStyle(container).position;
+      if (computedPosition === "static") {
+        container.style.position = "relative";
+      }
     }
-    return wrapper;
-  }
-
-  function getOrCreateOverlay(wrapper) {
-    return wrapper.querySelector(".t3-toggle-overlay") || createElement("div", "t3-toggle-overlay", wrapper);
+    return overlay;
   }
 
   // --- Animation ---
@@ -85,27 +85,30 @@
     if (!container) return;
 
     const btn = getFloatingButton();
-    const wrapper = getOrCreateWrapper(container);
-    const overlay = getOrCreateOverlay(wrapper);
+    const overlay = getOrCreateOverlay(container);
+
+    // Ensure container has transition for max-height animation
+    container.style.transition = `max-height ${DURATION}ms ${EASING}`;
 
     if (collapsed) {
       const height = container.offsetHeight;
 
-      wrapper.style.overflow = "hidden";
-      wrapper.style.height = `${height}px`;
-      wrapper.style.pointerEvents = "none";
+      // Collapse: animate from current height to 0
+      container.style.overflow = "hidden";
+      container.style.maxHeight = `${height}px`;
+      container.style.pointerEvents = "none";
       overlay.style.display = "block";
       overlay.style.opacity = "0";
       overlay.style.transition = `opacity 150ms ${EASING}`;
       isAnimating = true;
 
       requestAnimationFrame(() => {
-        wrapper.style.height = "0px";
+        container.style.maxHeight = "0px";
         overlay.style.opacity = "1";
       });
 
       setTimeout(() => {
-        wrapper.style.display = "none";
+        container.style.display = "none";
         isAnimating = false;
       }, DURATION);
 
@@ -117,27 +120,30 @@
         btn.style.transform = "scale(1)";
       });
     } else {
-      wrapper.style.display = "";
-      wrapper.style.overflow = "hidden";
-      wrapper.style.height = "0px";
-      wrapper.style.pointerEvents = "none";
+      // Expand: animate from 0 to natural height
+      container.style.display = "";
+      container.style.overflow = "hidden";
+      container.style.maxHeight = "0px";
+      container.style.pointerEvents = "none";
       overlay.style.display = "block";
       overlay.style.opacity = "1";
       overlay.style.transition = `opacity 400ms ${EASING}`;
       isAnimating = true;
 
-      const targetHeight = container.offsetHeight;
+      // Measure natural height (scrollHeight works even with maxHeight: 0)
+      const targetHeight = container.scrollHeight;
 
       requestAnimationFrame(() => {
-        wrapper.style.height = `${targetHeight}px`;
+        container.style.maxHeight = `${targetHeight}px`;
         overlay.style.opacity = "0";
       });
 
       setTimeout(() => {
-        wrapper.style.overflow = "";
-        wrapper.style.height = "";
+        container.style.overflow = "";
+        container.style.maxHeight = "";
+        container.style.transition = "";
         overlay.style.display = "none";
-        wrapper.style.pointerEvents = "";
+        container.style.pointerEvents = "";
         isAnimating = false;
       }, DURATION);
 
@@ -158,7 +164,6 @@
 
     e.preventDefault();
     e.stopPropagation();
-    e.stopImmediatePropagation();
 
     const newState = !isCollapsed();
     setCollapsed(newState);
@@ -168,20 +173,12 @@
   // --- MutationObserver (re-inject button on React re-renders) ---
 
   function setupObserver() {
-    let timer = null;
-
     const observer = new MutationObserver(() => {
       const form = getForm();
       if (!form || form.querySelector(".t3-toggle-inline")) return;
 
-      observer.disconnect();
       createInlineButton(form);
       applyState(isCollapsed());
-
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        observer.observe(document.body, { childList: true, subtree: true });
-      }, 500);
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
@@ -195,10 +192,6 @@
     const style = createElement("style", null, document.head);
     style.id = "t3-toggle-styles";
     style.textContent = `
-      .t3-toggle-wrapper {
-        position: relative;
-        transition: height ${DURATION}ms ${EASING};
-      }
       .t3-toggle-overlay {
         display: none;
         position: absolute;
