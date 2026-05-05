@@ -10,6 +10,7 @@
   const EASING = "cubic-bezier(0.4, 0, 0.2, 1)";
 
   let isAnimating = false;
+  let isInitialized = false;
 
   const ICON_DOWN =
     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
@@ -174,6 +175,9 @@
 
   function setupObserver() {
     const observer = new MutationObserver(() => {
+      // Don't modify DOM during React's initial hydration phase
+      if (!isInitialized) return;
+      
       const form = getForm();
       if (!form || form.querySelector(".t3-toggle-inline")) return;
 
@@ -279,13 +283,30 @@
 
     applyState(isCollapsed());
     setupObserver();
+    
+    // Mark as initialized so MutationObserver can start working
+    isInitialized = true;
+  }
+
+  // Delay initialization to avoid React hydration conflicts
+  // React hydrates server-rendered HTML after DOMContentLoaded
+  // We wait for the next idle period to ensure React is done
+  function delayedInit() {
+    // Use requestIdleCallback if available, otherwise setTimeout
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(init, { timeout: 2000 });
+    } else {
+      setTimeout(init, 1000);
+    }
   }
 
   document.addEventListener("click", handleClick, true);
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+    // Wait for DOMContentLoaded, then delay further for React hydration
+    document.addEventListener("DOMContentLoaded", delayedInit);
   } else {
-    init();
+    // Document already loaded, but still delay for React
+    delayedInit();
   }
 })();
